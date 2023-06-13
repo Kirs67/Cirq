@@ -74,8 +74,8 @@ def test_fallback_diagram():
 a W a
 b W b
 c W c
-b G MagicOperate
-b a c G MagicGate
+b G MagicOperate width=72
+b a c G MagicGate width=54
 """.strip()
     assert_has_qpic_representation(circuit, expected_diagram)
 
@@ -101,7 +101,7 @@ alice W alice
 carrier W carrier
 bob W bob
 carrier H
-alice G $X^{0.5}$
+alice G $X^{0.5}$ width=24
 bob C carrier
 carrier C alice
 alice H
@@ -173,6 +173,6 @@ def test_sqrt_iswap_diagram():
     expected_diagram = r"""
 q(0) W q(0)
 q(1) W q(1)
-q(0) q(1) G $ISWAP^{0.5}$
+q(0) q(1) G $ISWAP^{0.5}$ width=48
 """.strip()
     assert_has_qpic_representation(circuit, expected_diagram)

@@ -71,6 +71,8 @@ def op_to_qpic(op: ops.Operation) -> str:
     Returns:
         QPIC language representation for the operation.
     """
+    arguments = {}
+
     match op.gate:
         case ops.X:
             op_symbol = 'X'
@@ -105,14 +107,22 @@ def op_to_qpic(op: ops.Operation) -> str:
             targets = op.qubits
             controls = []
         case _:
-            op_symbol = f'G {get_latex_name(op)}'
+            name = get_latex_name(op)
+            op_symbol = f'G {name}'
             targets = op.qubits
             controls = []
+            effective_len = len(name.replace('$', '').replace('^', '').replace('{', '').replace('}', ''))
+            if effective_len > 1:
+                arguments["width"] = effective_len*6
 
     targets = [qpic_qubit_namer(q) for q in targets]
     controls = [qpic_qubit_namer(q) for q in controls]
 
-    return f"{' '.join(targets)} {op_symbol} {' '.join(controls)}".strip()
+    command = f'{" ".join(targets)} {op_symbol} {" ".join(controls)}'.strip()
+    for argument, value in arguments.items():
+        command += f' {argument}={value}'
+
+    return command
 
 
 def circuit_to_qpic_lang(
