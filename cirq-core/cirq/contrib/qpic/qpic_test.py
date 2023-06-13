@@ -25,7 +25,7 @@ def assert_has_qpic_representation(actual: cirq.Circuit, desired: str, **kwargs)
         desired: The desired QPIC language representation as a string. Newlines at the
             beginning and whitespace at the end are ignored.
         **kwargs: Keyword arguments to be passed to
-            circuit_to_qpic_language.
+            circuit_to_qpic_lang.
     """
     actual_diagram = ccq.circuit_to_qpic_lang(actual, **kwargs).lstrip('\n').rstrip()
     desired_diagram = desired.lstrip("\n").rstrip()
@@ -75,7 +75,7 @@ a W a
 b W b
 c W c
 b G MagicOperate width=72
-b a c G MagicGate width=54
+a b c G MagicGate width=54
 """.strip()
     assert_has_qpic_representation(circuit, expected_diagram)
 

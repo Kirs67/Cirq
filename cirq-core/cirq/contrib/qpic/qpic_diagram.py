@@ -62,11 +62,12 @@ def get_latex_name(op: ops.Operation) -> str:
     return name
 
 
-def op_to_qpic(op: ops.Operation) -> str:
+def op_to_qpic(op: ops.Operation, qubit_order: 'cirq.QubitOrder') -> str:
     """Returns QPIC language representation for the operation.
 
     Args:
         op: the operation to represent
+        qubit_order: Determines the order of qubit wires in targets/controls.
 
     Returns:
         QPIC language representation for the operation.
@@ -115,7 +116,12 @@ def op_to_qpic(op: ops.Operation) -> str:
             if effective_len > 1:
                 arguments["width"] = effective_len*6
 
+    ordered_targets = qubit_order.order_for(targets)
+    targets = [q for q in ordered_targets if q in targets] #as the qubit order MIGHT spit out all the qubits
     targets = [qpic_qubit_namer(q) for q in targets]
+
+    ordered_controls = qubit_order.order_for(controls)
+    controls = [q for q in ordered_controls if q in controls] # same as for the targets
     controls = [qpic_qubit_namer(q) for q in controls]
 
     command = f'{" ".join(targets)} {op_symbol} {" ".join(controls)}'.strip()
@@ -137,7 +143,8 @@ def circuit_to_qpic_lang(
     Returns:
         QPIC language representation for the diagram.
     """
-    qubits = ops.QubitOrder.as_qubit_order(qubit_order).order_for(circuit.all_qubits())
+    qubit_order = ops.QubitOrder.as_qubit_order(qubit_order)
+    qubits = qubit_order.order_for(circuit.all_qubits())
     names = [qpic_qubit_namer(q) for q in qubits]
     labels = [str(q) for q in qubits]
 
@@ -148,7 +155,7 @@ def circuit_to_qpic_lang(
     for moment in circuit.moments:
         non_global_ops.extend( [op for op in moment.operations if op.qubits] )
 
-    operations = [op_to_qpic(op) for op in non_global_ops]
+    operations = [op_to_qpic(op, qubit_order) for op in non_global_ops]
     operations = "\n".join(operations)
 
     return declarations + "\n" + operations
