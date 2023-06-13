@@ -176,3 +176,22 @@ q(1) W q(1)
 q(0) q(1) G $ISWAP^{0.5}$ width=48
 """.strip()
     assert_has_qpic_representation(circuit, expected_diagram)
+
+
+def test_parametrized_diagram():
+    a, b, c = cirq.LineQubit.range(3)
+
+    circuit = cirq.Circuit(cirq.X(a), cirq.Y(b), cirq.Z(c))
+
+    expected_diagram = r"""
+HEADER TEST DIAGRAM
+VERTICAL
+WIREPAD 10
+q(0) W q(0)
+q(1) W q(1)
+q(2) W q(2)
+q(0) X
+q(1) G Y
+q(2) Z
+""".strip()
+    assert_has_qpic_representation(circuit, expected_diagram, header="TEST DIAGRAM", vertical=True, wirepad=10)

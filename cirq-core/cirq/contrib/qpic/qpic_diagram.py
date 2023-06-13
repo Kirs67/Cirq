@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union, Tuple, List
+from numbers import Number
 
 from cirq import circuits, ops
 
@@ -132,13 +133,17 @@ def op_to_qpic(op: ops.Operation, qubit_order: 'cirq.QubitOrder') -> str:
 
 
 def circuit_to_qpic_lang(
-    circuit: 'cirq.Circuit', qubit_order: 'cirq.QubitOrderOrList' = ops.QubitOrder.DEFAULT
+    circuit: 'cirq.Circuit', qubit_order: 'cirq.QubitOrderOrList' = ops.QubitOrder.DEFAULT, **kwargs
 ) -> str:
     """Returns QPIC language representation for the circuit which can be converted to LaTeX with qpic script.
 
     Args:
         circuit: The circuit to convert.
         qubit_order: Determines the order of qubit wires in the diagram.
+        kwargs: can be used to insert macros or global parameters into the QPIC code. If the value is boolean, the
+            capitalized key is inserted into the QPIC code (or not, depending on if the value is True), otherwise a line
+            with capitalized key and then the value as a string is inserted. Consult the QPIC documentation for the list
+            of the macros and parameters.
 
     Returns:
         QPIC language representation for the diagram.
@@ -158,4 +163,18 @@ def circuit_to_qpic_lang(
     operations = [op_to_qpic(op, qubit_order) for op in non_global_ops]
     operations = "\n".join(operations)
 
-    return declarations + "\n" + operations
+    preamble = []
+    for (key, value) in kwargs.items():
+        if isinstance(value, bool):
+            if value:
+                preamble.append(key.upper())
+        else:
+            preamble.append(f'{key.upper()} {value}')
+
+
+    preamble = "\n".join(preamble)
+
+    parts = [preamble, declarations, operations]
+    parts = [p for p in parts if p]
+
+    return "\n".join(parts)
