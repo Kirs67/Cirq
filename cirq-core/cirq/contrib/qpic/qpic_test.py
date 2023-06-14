@@ -195,3 +195,24 @@ q(1) G Y
 q(2) Z
 """.strip()
     assert_has_qpic_representation(circuit, expected_diagram, header="TEST DIAGRAM", vertical=True, wirepad=10)
+
+
+def test_latex_in_names():
+    a = cirq.NamedQubit(r'|q_0\rangle')
+    b = cirq.NamedQubit(r'|q_1\rangle')
+    c = cirq.NamedQubit(r'|q_2\rangle')
+
+    circuit = cirq.Circuit(cirq.X(a), cirq.Y(b), cirq.Z(c))
+
+    expected_diagram = r"""
+HEADER TEST DIAGRAM
+VERTICAL
+WIREPAD 10
+|q_0rangle W |q_0\rangle
+|q_1rangle W |q_1\rangle
+|q_2rangle W |q_2\rangle
+|q_0rangle X
+|q_1rangle G Y
+|q_2rangle Z
+""".strip()
+    assert_has_qpic_representation(circuit, expected_diagram, header="TEST DIAGRAM", vertical=True, wirepad=10)
